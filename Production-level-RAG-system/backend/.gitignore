@@ -1,0 +1,10 @@
+/myvenv
+
+.env
+__pycache__/
+*.pyc
+
+vector_store/
+mlflow/
+mlflow.db
+rag_assistant.db

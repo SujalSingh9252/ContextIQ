@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+html {
+  background-color: #080a0f;
+}
+
+body {
+  background-color: #080a0f;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  background-color: #080a0f;
+  min-height: 100vh;
+}
+
+/* Completely hide default scrollbars for all elements, letting our custom React component handle scrolling visuals */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
