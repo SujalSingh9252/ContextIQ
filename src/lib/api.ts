@@ -1,25 +1,37 @@
 import { supabase } from './supabase';
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const token = session?.access_token;
+
   if (!token) return {};
-  return { Authorization: `Bearer ${token}` };
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (res.status === 401) {
     await supabase.auth.signOut();
     window.location.href = '/login';
-    // The redirect above will navigate away; throw so callers don't continue.
+
     throw new Error('Session expired — redirecting to login.');
   }
+
   if (!res.ok) {
     const body = await res.text();
     throw new Error(body || `Request failed (${res.status})`);
   }
+
   return res.json() as Promise<T>;
 }
 
@@ -30,14 +42,16 @@ export async function uploadPdf(
   file: File,
 ): Promise<{ status: string; filename: string }> {
   const headers = await getAuthHeaders();
+
   const form = new FormData();
   form.append('file', file);
 
-  const res = await fetch('/api/upload', {
+  const res = await fetch(`${API_BASE_URL}/api/upload`, {
     method: 'POST',
-    headers,          // Content-Type is set automatically by the browser for FormData
+    headers,
     body: form,
   });
+
   return handleResponse(res);
 }
 
@@ -46,22 +60,37 @@ export async function askQuery(
   query: string,
 ): Promise<{ answer: string; sources: string[]; latency: number }> {
   const headers = await getAuthHeaders();
-  const res = await fetch(`/api/ask?q=${encodeURIComponent(query)}`, {
-    headers,
-  });
+
+  const res = await fetch(
+    `${API_BASE_URL}/api/ask?q=${encodeURIComponent(query)}`,
+    {
+      headers,
+    },
+  );
+
   return handleResponse(res);
 }
 
 /** Retrieve the list of indexed documents. */
 export async function getDocuments(): Promise<{ documents: any[] }> {
   const headers = await getAuthHeaders();
-  const res = await fetch('/api/documents', { headers });
+
+  const res = await fetch(`${API_BASE_URL}/api/documents`, {
+    headers,
+  });
+
   return handleResponse(res);
 }
 
 /** Check whether any documents have been indexed. */
-export async function getStatus(): Promise<{ documents_indexed: boolean }> {
+export async function getStatus(): Promise<{
+  documents_indexed: boolean;
+}> {
   const headers = await getAuthHeaders();
-  const res = await fetch('/api/status', { headers });
+
+  const res = await fetch(`${API_BASE_URL}/api/status`, {
+    headers,
+  });
+
   return handleResponse(res);
 }
